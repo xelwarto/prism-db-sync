@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+Name: config_example.xml
+Written by: Ted Elwartowski
+Description:
+Example DataBaseSync configuration file
+
+This is an example configuration only and this file should be modified before
+attempting to be used.
+-->
+<config>
+    <app>
+        <directory>/opt/tools/DataBaseSync</directory>
+        <!-- Configure error control -->
+        <errors stop="no"/>
+        <!-- Configure logging options -->
+        <logging debug="yes" verbose="yes"/>
+    </app>
+    <files>
+        <log>${app.directory}/logs/DataBaseSync_common.log</log>
+    </files>
+    <databases>
+        <!-- Example of informix database setup as the source -->
+        <!--
+        <source>
+            <name>common</name>
+            <type>informix</type>
+            <driver>com.informix.jdbc.IfxDriver</driver>
+            <url>jdbc:informix-sqli://fpadb01.unfpa.org:1525/common:INFORMIXSERVER=ol_dev</url>
+            <user>dbcon</user>
+            <password fetch="0"/>
+            <transactions>Yes</transactions>
+        </source>
+        -->
+        <source>
+            <name>test1</name>
+            <type>mysql</type>
+            <driver>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</driver>
+            <url>jdbc:mysql://localhost:3306/test1</url>
+            <user>dbSync</user>
+            <password>test1234</password>
+            <transactions>No</transactions>
+        </source>
+        <destination>
+            <name>test2</name>
+            <type>mysql</type>
+            <driver>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</driver>
+            <url>jdbc:mysql://localhost:3306/test2</url>
+            <user>dbSync</user>
+            <password>test1234</password>
+            <transactions>No</transactions>
+        </destination>
+    </databases>
+    <tables sync_all="yes" sync_data="yes"/>
+    <!-- Advanced Configurations -->
+    <!--
+    <tables sync_all="yes" sync_data="no">
+        <table name="test" sync="yes" sync_data="yes" to_table="test2"/>
+        <table name="country" sync="no"/>
+    </tables>
+    -->
+    <!--
+        SQL Queries:
+            - Commas in SQL statements must be escaped
+    -->
+    <!--
+    <queries>
+        <query name="example1">
+            <destination>delete from table1</destination>
+        </query>
+        <query name="example2">
+            <source>select f1\,f2 from table1</source>
+            <destination>insert into table1(f1\,f2) values(?\,?)</destination>
+            <checksum level="Low">select f1\,f2 from table1</checksum>
+            <rollback>
+                <query database="src">delete from table1</query>
+                <query database="dest">delete from table2</query>
+            </rollback>
+        </query>
+    </queries>
+    -->
+</config>
