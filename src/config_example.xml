@@ -3,7 +3,7 @@
 Name: config_example.xml
 Written by: Ted Elwartowski
 Description:
-Example DataBaseSync configuration file
+Example Prism DataBase Sync configuration file
 
 This is an example configuration only and this file should be modified before
 attempting to be used.
@@ -20,18 +20,7 @@ attempting to be used.
         <log>${app.directory}/logs/DataBaseSync_common.log</log>
     </files>
     <databases>
-        <!-- Example of informix database setup as the source -->
-        <!--
-        <source>
-            <name>common</name>
-            <type>informix</type>
-            <driver>com.informix.jdbc.IfxDriver</driver>
-            <url>jdbc:informix-sqli://fpadb01.unfpa.org:1525/common:INFORMIXSERVER=ol_dev</url>
-            <user>dbcon</user>
-            <password fetch="0"/>
-            <transactions>Yes</transactions>
-        </source>
-        -->
+        <!-- Example of source database setup -->
         <source>
             <name>test1</name>
             <type>mysql</type>
@@ -41,6 +30,7 @@ attempting to be used.
             <password>test1234</password>
             <transactions>No</transactions>
         </source>
+        <!-- Example of destination database setup -->
         <destination>
             <name>test2</name>
             <type>mysql</type>
@@ -57,6 +47,8 @@ attempting to be used.
     <tables sync_all="yes" sync_data="no">
         <table name="test" sync="yes" sync_data="yes" to_table="test2"/>
         <table name="country" sync="no"/>
+        <table name="table2" before="test3"/>
+        <table name="table4" after="test5"/>
     </tables>
     -->
     <!--
