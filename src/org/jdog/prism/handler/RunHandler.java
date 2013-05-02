@@ -31,6 +31,7 @@ public class RunHandler {
 		DataBaseHandler destDatabase = null;
 
 		try {
+			log.debug("Validating the configuration file");
 			ConfigHandler.validate(config);
 			srcDatabase = new DataBaseHandler(
 					config.getString("databases.source.type"),
@@ -67,7 +68,7 @@ public class RunHandler {
 					}
 				}
 
-				log.debug("RunHandler: Attempting to connect to source database ("
+				log.log("RunHandler: Attempting to connect to source database ("
 						+ srcDatabase.getType()
 						+ ":"
 						+ srcDatabase.getName()
@@ -83,7 +84,7 @@ public class RunHandler {
 								config.getString("databases.source.user"),
 								srcPassword });
 
-				log.debug("RunHandler: Attempting to connect to destination database ("
+				log.log("RunHandler: Attempting to connect to destination database ("
 						+ destDatabase.getType()
 						+ ":"
 						+ destDatabase.getName()
@@ -163,6 +164,8 @@ public class RunHandler {
 							table.put("TO", tableName);
 							table.put("SYNC", syncAll);
 							table.put("SYNCDATA", defSyncData);
+							table.put("BEFORE", null);
+							table.put("AFTER", null);
 							syncTables.add(table);
 						}
 					}
@@ -184,6 +187,9 @@ public class RunHandler {
 
 						}
 					}
+
+					log.debug("RunHandler: Ordering sync table list");
+					syncTables = ConfigHandler.orderTables(syncTables);
 
 					if (syncTables != null) {
 						if (syncTables.size() > 0) {
@@ -232,31 +238,24 @@ public class RunHandler {
 					try {
 						if (srcDatabase.isTransactional()
 								|| destDatabase.isTransactional()) {
-							
-							
+
 							/*
 							 * FIX HERE
-							 *
-							 *
-							Iterator<HashMap<String, Object>> it = queries
-									.iterator();
-							while (it.hasNext()) {
-								HashMap<String, Object> query = (HashMap<String, Object>) it
-										.next();
-								if (query.get("RLBK") != null) {
-									List<?> rollBacks = (List<?>) query
-											.get("RLBK");
-									if (rollBacks != null
-											&& rollBacks.size() > 0) {
-										throw new Exception(
-												"Rollback queries not allowed when database transactions are enabled");
-									}
-								}
-								
-							}
-							*/
-							
-							
+							 * 
+							 * 
+							 * Iterator<HashMap<String, Object>> it = queries
+							 * .iterator(); while (it.hasNext()) {
+							 * HashMap<String, Object> query = (HashMap<String,
+							 * Object>) it .next(); if (query.get("RLBK") !=
+							 * null) { List<?> rollBacks = (List<?>) query
+							 * .get("RLBK"); if (rollBacks != null &&
+							 * rollBacks.size() > 0) { throw new Exception(
+							 * "Rollback queries not allowed when database transactions are enabled"
+							 * ); } }
+							 * 
+							 * }
+							 */
+
 						}
 
 						Iterator<HashMap<String, Object>> it = queries
@@ -279,11 +278,8 @@ public class RunHandler {
 							qry.commit();
 						}
 						/*
-						 * FIX HERE
-						if (qry.hasError()) {
-							qry.rollBack();
-						}
-						*/
+						 * FIX HERE if (qry.hasError()) { qry.rollBack(); }
+						 */
 					} catch (Exception e) {
 						log.log("RunHandler Error: " + e.toString());
 					}

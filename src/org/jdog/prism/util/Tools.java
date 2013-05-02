@@ -38,7 +38,7 @@ public class Tools {
 	}
 
 	public static void showHelp() {
-		showBanner();
+		System.out.println();
 		System.out
 				.println(Variables.APPHELP
 						+ "\n\n"

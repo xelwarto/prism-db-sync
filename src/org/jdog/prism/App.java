@@ -43,6 +43,10 @@ public class App {
 			config.setFile((String) params.get("config"));
 		}
 
+		if (!log.isQuiet()) {
+			Tools.showBanner();
+		}
+
 		try {
 			config.loadXML();
 		} catch (Exception e) {
@@ -67,22 +71,20 @@ public class App {
 		}
 
 		if (!hasError) {
-			if (config.getString("app.logging[@debug]") != null) {
-				if (config.getString("app.logging[@debug]").equalsIgnoreCase(
-						"yes")) {
-					log.setDebug(true);
-				}
-			}
-
-			if (config.getString("app.logging[@verbose]") != null) {
-				if (config.getString("app.logging[@verbose]").equalsIgnoreCase(
-						"yes")) {
-					log.setVerbose(true);
-				}
-			}
-
 			if (!log.isQuiet()) {
-				Tools.showBanner();
+				if (config.getString("app.logging[@debug]") != null) {
+					if (config.getString("app.logging[@debug]")
+							.equalsIgnoreCase("yes")) {
+						log.setDebug(true);
+					}
+				}
+
+				if (config.getString("app.logging[@verbose]") != null) {
+					if (config.getString("app.logging[@verbose]")
+							.equalsIgnoreCase("yes")) {
+						log.setVerbose(true);
+					}
+				}
 			}
 
 			RunHandler app = new RunHandler(log, config);

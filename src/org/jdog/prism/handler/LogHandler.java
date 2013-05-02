@@ -31,11 +31,6 @@ public class LogHandler {
 	public LogHandler() {
 	}
 
-	public void setDebug(boolean debug) {
-		this.debug = debug;
-		log("Setting Debug value: " + debug);
-	}
-
 	public boolean isDebug() {
 		return debug;
 	}
@@ -48,9 +43,13 @@ public class LogHandler {
 		return quiet;
 	}
 
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
-		log("Setting Verbose value: " + verbose);
+		this.debug = verbose;
 	}
 
 	public void setQuiet(boolean quiet) {
@@ -86,7 +85,9 @@ public class LogHandler {
 		if (message != null) {
 			if (debug) {
 				System.out.print(getDate());
-				System.out.print(Variables.LOG_DEBUG);
+				if (!this.isVerbose()) {
+					System.out.print(Variables.LOG_DEBUG);
+				}
 				System.out.println(message);
 
 				if (out != null) {

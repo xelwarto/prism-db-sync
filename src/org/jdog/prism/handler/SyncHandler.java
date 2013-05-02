@@ -92,7 +92,7 @@ public class SyncHandler {
 						if (fromTables.contains(fromTable)) {
 							if (toTables.contains(toTable)) {
 
-								log.debug("SyncHandler: Attempting to sync source table("
+								log.log("SyncHandler: Attempting to sync source table("
 										+ fromTable
 										+ ") "
 										+ "to destination table("
