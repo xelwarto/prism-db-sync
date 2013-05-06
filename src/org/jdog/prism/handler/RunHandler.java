@@ -155,6 +155,14 @@ public class RunHandler {
 						}
 					}
 
+					Boolean fkeyCheck = new Boolean(true);
+					if (config.getString("tables[@foreign_key_checks]") != null) {
+						if (config.getString("tables[@foreign_key_checks]")
+								.equalsIgnoreCase("no")) {
+							fkeyCheck = new Boolean(false);
+						}
+					}
+
 					Iterator<String> it = fromTables.iterator();
 					while (it.hasNext()) {
 						String tableName = (String) it.next();
@@ -192,28 +200,41 @@ public class RunHandler {
 					syncTables = ConfigHandler.orderTables(syncTables);
 
 					if (syncTables != null) {
-						if (syncTables.size() > 0) {
-							Iterator<HashMap<String, Object>> tableIt = syncTables
-									.iterator();
-							while (tableIt.hasNext()) {
-								HashMap<String, Object> table = (HashMap<String, Object>) tableIt
-										.next();
-								if (table != null) {
-									sync.syncTable(table);
-									if (sync.hasError()) {
-										if (config
-												.getString("app.errors[@stop]") != null) {
-											if (config.getString(
-													"app.errors[@stop]")
-													.equalsIgnoreCase("yes")) {
-												break;
+						if (!fkeyCheck.booleanValue()) {
+							log.debug("RunHandler: disabling foreign key checks");
+							sync.disableFKeyCheck();
+						}
+
+						if (!sync.hasError()) {
+							if (syncTables.size() > 0) {
+								Iterator<HashMap<String, Object>> tableIt = syncTables
+										.iterator();
+								while (tableIt.hasNext()) {
+									HashMap<String, Object> table = (HashMap<String, Object>) tableIt
+											.next();
+									if (table != null) {
+										sync.syncTable(table);
+										if (sync.hasError()) {
+											if (config
+													.getString("app.errors[@stop]") != null) {
+												if (config
+														.getString(
+																"app.errors[@stop]")
+														.equalsIgnoreCase("yes")) {
+													break;
+												}
 											}
 										}
 									}
 								}
+							} else {
+								log.debug("RunHandler: syncTables is empty");
 							}
-						} else {
-							log.debug("RunHandler: syncTables is empty");
+						}
+
+						if (!fkeyCheck.booleanValue()) {
+							log.debug("RunHandler: enabling"
+									+ " foreign key checks");
 						}
 					} else {
 						log.log("RunHandler Error: null pointer exception (syncTables)");

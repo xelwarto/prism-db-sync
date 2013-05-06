@@ -8,4 +8,6 @@ public class Variables {
 	
 	public final static String LOG_DEBUG = "DEBUG: ";
 	public final static String LOG_DATE = "MMM dd yyyy HH:mm:ss";
+	
+	public final static String FKEYCHK_SQL = "SET FOREIGN_KEY_CHECKS=";
 }

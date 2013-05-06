@@ -69,7 +69,31 @@ public class SyncHandler {
 		} else {
 			_log("SyncHandler Error: null pointer exception (DataBaseHanlder)");
 		}
+	}
 
+	public void disableFKeyCheck() {
+		if (destDatabase != null) {
+			try {
+				destDatabase.fKeyControl("0");
+			} catch (Exception e) {
+				_log("SyncHandler Error: " + e.toString());
+			}
+		} else {
+			_log("SyncHandler Error: null pointer exception (DataBaseHanlder)");
+		}
+
+	}
+
+	public void enableFKeyCheck() throws Exception {
+		if (destDatabase != null) {
+			try {
+				destDatabase.fKeyControl("1");
+			} catch (Exception e) {
+				_log("SyncHandler Error: " + e.toString());
+			}
+		} else {
+			_log("SyncHandler Error: null pointer exception (DataBaseHanlder)");
+		}
 	}
 
 	private void _syncTable(HashMap<String, Object> syncConf) {
