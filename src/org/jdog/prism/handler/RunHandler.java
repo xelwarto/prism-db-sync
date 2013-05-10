@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jdog.prism.util.Variables;
 import org.jdog.xml.xmlConfig;
 
 /**
@@ -47,12 +48,6 @@ public class RunHandler {
 
 		if (srcDatabase != null && destDatabase != null) {
 			try {
-				String srcPassword = config
-						.getString("databases.source.password");
-
-				String destPassword = config
-						.getString("databases.destination.password");
-
 				boolean srcTrans = false;
 				boolean destTrans = false;
 				if (config.getString("databases.source.transactions") != null) {
@@ -77,12 +72,14 @@ public class RunHandler {
 					log.verbose("RunHandler: Setting source database to use transactions");
 					srcDatabase.setTransactional(true);
 				}
-				srcDatabase
-						.getConnection(new String[] {
-								config.getString("databases.source.driver"),
-								config.getString("databases.source.url"),
-								config.getString("databases.source.user"),
-								srcPassword });
+
+				srcDatabase.setDriver(config
+						.getString("databases.source.driver"));
+				srcDatabase.setUrl(config.getString("databases.source.url"));
+				srcDatabase.setUser(config.getString("databases.source.user"));
+				srcDatabase.setPassword(config
+						.getString("databases.source.password"));
+				srcDatabase.connect();
 
 				log.log("RunHandler: Attempting to connect to destination database ("
 						+ destDatabase.getType()
@@ -93,11 +90,16 @@ public class RunHandler {
 					log.verbose("RunHandler: Setting destination database to use transactions");
 					destDatabase.setTransactional(true);
 				}
-				destDatabase.getConnection(new String[] {
-						config.getString("databases.destination.driver"),
-						config.getString("databases.destination.url"),
-						config.getString("databases.destination.user"),
-						destPassword });
+
+				destDatabase.setDriver(config
+						.getString("databases.destination.driver"));
+				destDatabase.setUrl(config
+						.getString("databases.destination.url"));
+				destDatabase.setUser(config
+						.getString("databases.destination.user"));
+				destDatabase.setPassword(config
+						.getString("databases.destination.password"));
+				destDatabase.connect();
 			} catch (Exception e) {
 				log.log("RunHandler Error: " + e.toString());
 				srcDatabase = null;
@@ -106,6 +108,17 @@ public class RunHandler {
 		}
 
 		if (srcDatabase != null && destDatabase != null) {
+
+			try {
+				if (config.getInt("databases[@batch_limit]") > 0) {
+					log.debug("RunHandler: Setting destination database batch limite to: " + config.getString("databases[@batch_limit]"));
+					destDatabase.setBatchLimit(config
+							.getInt("databases[@batch_limit]"));
+				}
+			} catch (Exception e) {
+				destDatabase.setBatchLimit(Variables.DB_BATCH_LIMIT);
+			}
+
 			if (config.getString("tables[@sync_all]") != null) {
 				List<String> fromTables = null;
 				List<String> toTables = null;

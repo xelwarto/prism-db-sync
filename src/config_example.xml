@@ -20,6 +20,7 @@ attempting to be used.
         <log>${app.directory}/logs/DataBaseSync_common.log</log>
     </files>
     <databases>
+    <!-- <databases batch_limit=""> -->
         <!-- Example of source database setup -->
         <source>
             <name>test1</name>
