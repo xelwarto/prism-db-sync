@@ -85,11 +85,13 @@ public class LogHandler {
 	public void debug(String message) {
 		if (message != null) {
 			if (debug) {
-				System.out.print(getDate());
-				if (!this.isVerbose()) {
-					System.out.print(Variables.LOG_DEBUG);
+				if (!quiet) {
+					System.out.print(getDate());
+					if (!this.isVerbose()) {
+						System.out.print(Variables.LOG_DEBUG);
+					}
+					System.out.println(message);
 				}
-				System.out.println(message);
 
 				if (out != null) {
 					out.print(getDate());

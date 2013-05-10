@@ -48,29 +48,25 @@ public class RunHandler {
 
 		if (srcDatabase != null && destDatabase != null) {
 			try {
-				boolean srcTrans = false;
-				boolean destTrans = false;
-				if (config.getString("databases.source.transactions") != null) {
-					if (config.getString("databases.source.transactions")
-							.equalsIgnoreCase("yes")) {
-						srcTrans = true;
-					}
-				}
-				if (config.getString("databases.destination.transactions") != null) {
-					if (config.getString("databases.destination.transactions")
-							.equalsIgnoreCase("yes")) {
-						destTrans = true;
-					}
-				}
-
 				log.log("RunHandler: Attempting to connect to source database ("
 						+ srcDatabase.getType()
 						+ ":"
 						+ srcDatabase.getName()
 						+ ")");
-				if (srcTrans) {
-					log.verbose("RunHandler: Setting source database to use transactions");
-					srcDatabase.setTransactional(true);
+				if (config.getString("databases.source.transactions") != null) {
+					if (config.getString("databases.source.transactions")
+							.equalsIgnoreCase("yes")) {
+						log.verbose("RunHandler: Setting source database to use transactions");
+						srcDatabase.setTransactional(true);
+					}
+				}
+
+				if (config.getString("databases.source.auto_reconnect") != null) {
+					if (config.getString("databases.source.auto_reconnect")
+							.equalsIgnoreCase("yes")) {
+						log.verbose("RunHandler: Setting source database to auto reconnect");
+						srcDatabase.setAutoReconnect(true);
+					}
 				}
 
 				srcDatabase.setDriver(config
@@ -86,9 +82,22 @@ public class RunHandler {
 						+ ":"
 						+ destDatabase.getName()
 						+ ")");
-				if (destTrans) {
-					log.verbose("RunHandler: Setting destination database to use transactions");
-					destDatabase.setTransactional(true);
+
+				if (config.getString("databases.destination.transactions") != null) {
+					if (config.getString("databases.destination.transactions")
+							.equalsIgnoreCase("yes")) {
+						log.verbose("RunHandler: Setting destination database to use transactions");
+						destDatabase.setTransactional(true);
+					}
+				}
+
+				if (config.getString("databases.destination.auto_reconnect") != null) {
+					if (config
+							.getString("databases.destination.auto_reconnect")
+							.equalsIgnoreCase("yes")) {
+						log.verbose("RunHandler: Setting destination database to auto reconnect");
+						destDatabase.setAutoReconnect(true);
+					}
 				}
 
 				destDatabase.setDriver(config
@@ -111,7 +120,8 @@ public class RunHandler {
 
 			try {
 				if (config.getInt("databases[@batch_limit]") > 0) {
-					log.debug("RunHandler: Setting destination database batch limite to: " + config.getString("databases[@batch_limit]"));
+					log.debug("RunHandler: Setting destination database batch limite to: "
+							+ config.getString("databases[@batch_limit]"));
 					destDatabase.setBatchLimit(config
 							.getInt("databases[@batch_limit]"));
 				}

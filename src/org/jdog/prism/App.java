@@ -71,19 +71,17 @@ public class App {
 		}
 
 		if (!hasError) {
-			if (!log.isQuiet()) {
-				if (config.getString("app.logging[@debug]") != null) {
-					if (config.getString("app.logging[@debug]")
-							.equalsIgnoreCase("yes")) {
-						log.setDebug(true);
-					}
+			if (config.getString("app.logging[@debug]") != null) {
+				if (config.getString("app.logging[@debug]").equalsIgnoreCase(
+						"yes")) {
+					log.setDebug(true);
 				}
+			}
 
-				if (config.getString("app.logging[@verbose]") != null) {
-					if (config.getString("app.logging[@verbose]")
-							.equalsIgnoreCase("yes")) {
-						log.setVerbose(true);
-					}
+			if (config.getString("app.logging[@verbose]") != null) {
+				if (config.getString("app.logging[@verbose]").equalsIgnoreCase(
+						"yes")) {
+					log.setVerbose(true);
 				}
 			}
 

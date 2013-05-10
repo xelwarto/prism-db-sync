@@ -49,8 +49,16 @@ public class Tools {
 	}
 
 	public static void showBanner() {
+
+		System.out.print("\n _____      _               \n");
+		System.out.print("|  __ \\    (_)              \n");
+		System.out.print("| |__) | __ _ ___ _ __ ___  \n");
+		System.out.print("|  ___/ '__| / __| '_ ` _ \\ \n");
+		System.out.print("| |   | |  | \\__ \\ | | | | |\n");
+		System.out.print("|_|   |_|  |_|___/_| |_| |_|\n");
+
 		System.out
-				.print("\n _____        _        ____                  _____                  \n");
+				.print(" _____        _        ____                  _____                  \n");
 		System.out
 				.print("|  __ \\      | |      |  _ \\                / ____|                 \n");
 		System.out

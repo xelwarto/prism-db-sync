@@ -30,6 +30,7 @@ attempting to be used.
             <user>dbSync</user>
             <password>test1234</password>
             <transactions>No</transactions>
+            <auto_reconnect>yes</auto_reconnect>
         </source>
         <!-- Example of destination database setup -->
         <destination>
@@ -40,6 +41,7 @@ attempting to be used.
             <user>dbSync</user>
             <password>test1234</password>
             <transactions>No</transactions>
+            <auto_reconnect>yes</auto_reconnect>
         </destination>
     </databases>
     <tables sync_all="yes" sync_data="yes"/>

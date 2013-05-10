@@ -37,6 +37,7 @@ public class DataBaseHandler {
 	private String url = null;
 	private String driver = null;
 	private Integer batchLimit = Variables.DB_BATCH_LIMIT;
+	private boolean autoReconnect = false;
 
 	public DataBaseHandler(String type, String name) {
 		this.type = type;
@@ -66,6 +67,14 @@ public class DataBaseHandler {
 		if (this.transactional && conn != null) {
 			conn.setAutoCommit(false);
 		}
+	}
+
+	public void setAutoReconnect(boolean autoReconnect) {
+		this.autoReconnect = autoReconnect;
+	}
+
+	public boolean isAutoReconnect() {
+		return autoReconnect;
 	}
 
 	public boolean isTransactional() {
@@ -315,7 +324,9 @@ public class DataBaseHandler {
 	private void verifyConn() throws Exception {
 		if (conn != null) {
 			if (!conn.isValid(Variables.DB_TIMEOUT)) {
-				this.connect();
+				if (autoReconnect) {
+					this.connect();
+				}
 			}
 		}
 	}
