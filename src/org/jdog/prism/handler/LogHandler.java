@@ -77,6 +77,7 @@ public class LogHandler {
 			if (out != null) {
 				out.print(getDate());
 				out.println(message);
+				out.flush();
 			}
 		}
 	}
@@ -92,8 +93,11 @@ public class LogHandler {
 
 				if (out != null) {
 					out.print(getDate());
-					out.print(Variables.LOG_DEBUG);
+					if (!this.isVerbose()) {
+						System.out.print(Variables.LOG_DEBUG);
+					}
 					out.println(message);
+					out.flush();
 				}
 			}
 		}
@@ -109,6 +113,7 @@ public class LogHandler {
 
 	public void close() throws Exception {
 		if (out != null) {
+			out.flush();
 			out.close();
 		}
 	}
