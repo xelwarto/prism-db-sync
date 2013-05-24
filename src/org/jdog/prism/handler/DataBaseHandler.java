@@ -157,9 +157,9 @@ public class DataBaseHandler {
 		}
 	}
 
-	public void loadTable(String table, List<Object[]> loadData)
+	public void loadTable(String table, int numColumns, List<Object[]> loadData)
 			throws Exception {
-		execBatchQuery(table, loadData);
+		execBatchInsert(table, numColumns, loadData);
 	}
 
 	public List<Object[]> unloadTable(String table) throws Exception {
@@ -196,49 +196,83 @@ public class DataBaseHandler {
 		}
 	}
 
-	public void execBatchQuery(String table, List<Object[]> dataList)
+	public void execStatement(String sql, List<Object> dataList)
 			throws Exception {
+		if (sql != null && !sql.equals("")) {
+			if (dataList != null) {
+				if (conn != null) {
+					PreparedStatement pstm = null;
+					try {
+						pstm = conn.prepareStatement(sql);
+
+						int dataPos = 1;
+						for (Object data : dataList) {
+							if (data == null) {
+								pstm.setNull(dataPos, Types.NULL);
+							} else {
+								String dataType = data.getClass().toString();
+								if (dataType.contains("String")) {
+									pstm.setString(dataPos, (String) data);
+								} else if (dataType.contains("Date")) {
+									pstm.setDate(dataPos, (java.sql.Date) data);
+								} else {
+									pstm.setObject(dataPos, data);
+								}
+							}
+							dataPos++;
+						}
+
+						pstm.execute();
+					} catch (Exception e) {
+						throw new Exception(errorHead + " " + e.toString());
+					} finally {
+						if (pstm != null) {
+							pstm.close();
+						}
+					}
+				} else {
+					throw new Exception(errorHead
+							+ "null pointer exception (conn)");
+				}
+			} else {
+				throw new Exception(errorHead
+						+ "null pointer exception (dataList)");
+			}
+		} else {
+			throw new Exception(errorHead + "null pointer exception (sql)");
+		}
+	}
+
+	public void execBatchInsert(String table, int numColumns,
+			List<Object[]> dataList) throws Exception {
 		if (conn != null) {
 			if (table != null) {
 				verifyConn();
 				if (dataList != null && !dataList.isEmpty()) {
-					Object[] data = (Object[]) dataList.get(0);
-					String sql = _buildInsert(table, data.length);
-
-					PreparedStatement pstm = conn.prepareStatement(sql);
-					int batchCnt = 0;
+					int batchSize = 0;
+					List<Object> batchData = new ArrayList<Object>();
 
 					Iterator<Object[]> dataIt = dataList.iterator();
 					while (dataIt.hasNext()) {
-						data = (Object[]) dataIt.next();
-						if (data != null && data.length > 0) {
-							for (int i = 0; i < data.length; i++) {
-								if (data[i] == null) {
-									pstm.setNull(i + 1, Types.NULL);
-								} else {
-									String dataType = data[i].getClass()
-											.toString();
-									if (dataType.contains("String")) {
-										pstm.setString(i + 1, (String) data[i]);
-									} else if (dataType.contains("Date")) {
-										pstm.setDate(i + 1,
-												(java.sql.Date) data[i]);
-									} else {
-										pstm.setObject(i + 1, data[i]);
-									}
+						Object[] data = (Object[]) dataIt.next();
+						for (int i = 0; i < data.length; i++) {
+							batchData.add(data[i]);
+						}
 
-								}
-							}
-							pstm.addBatch();
-							batchCnt++;
-							if (batchCnt >= this.getBatchLimit().intValue()) {
-								batchCnt = 0;
-								pstm.executeBatch();
-							}
+						batchSize++;
+						if (batchSize >= batchLimit.intValue()) {
+							String sql = _buildInsert(table, numColumns,
+									batchSize);
+							execStatement(sql, batchData);
+							batchSize = 0;
+							batchData.clear();
 						}
 					}
-					pstm.executeBatch();
-					pstm.close();
+
+					if (batchSize > 0) {
+						String sql = _buildInsert(table, numColumns, batchSize);
+						execStatement(sql, batchData);
+					}
 				}
 			} else {
 				throw new Exception(errorHead
@@ -321,6 +355,10 @@ public class DataBaseHandler {
 		this.execQuery(Variables.FKEYCHK_SQL + value, new Object[0]);
 	}
 
+	public void unqControl(String value) throws Exception {
+		this.execQuery(Variables.UNQCHK_SQL + value, new Object[0]);
+	}
+
 	private void verifyConn() throws Exception {
 		if (conn != null) {
 			if (!conn.isValid(Variables.DB_TIMEOUT)) {
@@ -331,17 +369,23 @@ public class DataBaseHandler {
 		}
 	}
 
-	private String _buildInsert(String table, int cols) {
+	private String _buildInsert(String table, int cols, int dataSize) {
 		String sql = "insert into ";
 		sql = sql.concat(table);
-		sql = sql.concat(" values(");
-		for (int i = 0; i < cols; i++) {
-			if (i != 0) {
+		sql = sql.concat(" values");
+		for (int d = 0; d < dataSize; d++) {
+			sql = sql.concat("(");
+			for (int i = 0; i < cols; i++) {
+				if (i != 0) {
+					sql = sql.concat(",");
+				}
+				sql = sql.concat("?");
+			}
+			sql = sql.concat(")");
+			if (d < dataSize - 1) {
 				sql = sql.concat(",");
 			}
-			sql = sql.concat("?");
 		}
-		sql = sql.concat(")");
 		return sql;
 	}
 }

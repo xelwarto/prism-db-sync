@@ -186,6 +186,14 @@ public class RunHandler {
 						}
 					}
 
+					Boolean uniqueCheck = new Boolean(true);
+					if (config.getString("tables[@unique_checks]") != null) {
+						if (config.getString("tables[@unique_checks]")
+								.equalsIgnoreCase("no")) {
+							uniqueCheck = new Boolean(false);
+						}
+					}
+
 					Iterator<String> it = fromTables.iterator();
 					while (it.hasNext()) {
 						String tableName = (String) it.next();
@@ -224,8 +232,11 @@ public class RunHandler {
 
 					if (syncTables != null) {
 						if (!fkeyCheck.booleanValue()) {
-							log.debug("RunHandler: disabling foreign key checks");
 							sync.disableFKeyCheck();
+						}
+
+						if (!uniqueCheck.booleanValue()) {
+							sync.disableUnqCheck();
 						}
 
 						if (!sync.hasError()) {
@@ -256,8 +267,11 @@ public class RunHandler {
 						}
 
 						if (!fkeyCheck.booleanValue()) {
-							log.debug("RunHandler: enabling"
-									+ " foreign key checks");
+							sync.enableFKeyCheck();
+						}
+
+						if (!uniqueCheck.booleanValue()) {
+							sync.enableUnqCheck();
 						}
 					} else {
 						log.log("RunHandler Error: null pointer exception (syncTables)");

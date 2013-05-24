@@ -72,6 +72,7 @@ public class SyncHandler {
 	}
 
 	public void disableFKeyCheck() {
+		log.debug("SyncHandler: disabling foreign key checks");
 		if (destDatabase != null) {
 			try {
 				destDatabase.fKeyControl("0");
@@ -84,10 +85,38 @@ public class SyncHandler {
 
 	}
 
-	public void enableFKeyCheck() throws Exception {
+	public void enableFKeyCheck() {
+		log.debug("SyncHandler: enabling foreign key checks");
 		if (destDatabase != null) {
 			try {
 				destDatabase.fKeyControl("1");
+			} catch (Exception e) {
+				_log("SyncHandler Error: " + e.toString());
+			}
+		} else {
+			_log("SyncHandler Error: null pointer exception (DataBaseHanlder)");
+		}
+	}
+
+	public void disableUnqCheck() {
+		log.debug("SyncHandler: disabling unique checks");
+		if (destDatabase != null) {
+			try {
+				destDatabase.unqControl("0");
+			} catch (Exception e) {
+				_log("SyncHandler Error: " + e.toString());
+			}
+		} else {
+			_log("SyncHandler Error: null pointer exception (DataBaseHanlder)");
+		}
+
+	}
+
+	public void enableUnqCheck() {
+		log.debug("SyncHandler: enabling unique checks");
+		if (destDatabase != null) {
+			try {
+				destDatabase.unqControl("1");
 			} catch (Exception e) {
 				_log("SyncHandler Error: " + e.toString());
 			}
@@ -176,6 +205,7 @@ public class SyncHandler {
 															destDatabase
 																	.loadTable(
 																			toTable,
+																			toFields.size(),
 																			dataStore);
 
 															if (destDatabase

@@ -47,7 +47,7 @@ attempting to be used.
     <tables sync_all="yes" sync_data="yes"/>
     <!-- Advanced Configurations -->
     <!--
-    <tables sync_all="yes" sync_data="no" foreign_key_checks="no">
+    <tables sync_all="yes" sync_data="no" foreign_key_checks="no" unique_checks="no">
         <table name="test" sync="yes" sync_data="yes" to_table="test2"/>
         <table name="country" sync="no"/>
         <table name="table2" before="test3"/>
